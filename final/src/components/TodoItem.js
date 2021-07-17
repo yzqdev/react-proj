@@ -20,9 +20,9 @@ const TodoItem = ({ id, title, completed }) => {
           <input
             type="checkbox"
             className="mr-3"
-            checked={completed}
+            defaultChecked={completed}
             onClick={handleCheckboxClick}
-          ></input>
+          />
           {title}
         </span>
         <button onClick={handleDeleteClick} className="btn btn-danger">
