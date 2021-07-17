@@ -39,12 +39,23 @@ let todos = [
     completed: false,
   },
 ];
-
+let users = [
+  { name: "aaa", id: nanoid() },
+  { name: "bbb", id: nanoid() },
+  { name: "ccc", id: nanoid() },
+];
 app.get("/todos", (req, res) => res.send(todos));
-
+app.get("/users", (req, res) => {
+  return res.send(users);
+});
 app.post("/todos", (req, res) => {
   const todo = { title: req.body.title, id: nanoid(), completed: false };
   todos.push(todo);
+  return res.send(todo);
+});
+app.post("/users", (req, res) => {
+  const todo = { name: req.body.name, id: nanoid() };
+  users.push(todo);
   return res.send(todo);
 });
 
@@ -70,4 +81,6 @@ app.delete("/todos/:id", (req, res) => {
 
 const PORT = 7000;
 
-app.listen(PORT, console.log(`Server running on port ${PORT}`.green.bold));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`.green.bold);
+});

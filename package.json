@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "vite --host",
-    "server": "nodemon server.js",
+    "server": "nodemon api/server.js",
     "dev": "concurrently \"yarn server\" \"yarn start\""
   },
   "eslintConfig": {

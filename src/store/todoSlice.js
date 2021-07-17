@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { nanoid } from "nanoid";
+import { nanoid } from "@reduxjs/toolkit";
 
 export const getTodosAsync = createAsyncThunk(
   "todos/getTodosAsync",
@@ -25,6 +25,7 @@ export const addTodoAsync = createAsyncThunk(
 
     if (resp.ok) {
       const todo = await resp.json();
+      console.log(todo)
       return { todo };
     }
   }
