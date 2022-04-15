@@ -1,0 +1,15 @@
+{
+  "name": "tstutor",
+  "version": "1.0.0",
+  "description": "typescript tutor",
+  "main": "index.js",
+  "repository": "https://github.com/yzqdev/tstutor",
+  "author": "yzq",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "naive-ui": "^2.15.2",
+    "prettier": "^2.3.2",
+    "typescript": "^4.3.5"
+  }
+}
