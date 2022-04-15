@@ -1,0 +1,205 @@
+import React, { Component, useEffect, useState } from "react";
+import PropTypes from "prop-types";
+
+import { connect } from "react-redux";
+import {
+  loadCart,
+  removeProduct,
+  changeProductQuantity,
+} from "@/store/cart/actions";
+import { updateCart } from "@/store/total/actions";
+import CartProduct from "./CartProduct";
+import { formatPrice } from "@/store/util";
+
+import "./style.scss";
+
+const FloatCart = ({
+  cartTotal,
+  cartProducts,
+  removeProduct,
+  changeProductQuantity,
+  loadCart,
+  newProduct,
+  productToChange,
+  productToRemove,
+  updateCart,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openFloatCart = () => {
+    setIsOpen(true);
+  };
+
+  const closeFloatCart = () => {
+    setIsOpen(false);
+  };
+
+  const addProduct = (product) => {
+    let productAlreadyInCart = false;
+
+    cartProducts.forEach((cp) => {
+      if (cp.id === product.id) {
+        cp.quantity += product.quantity;
+        productAlreadyInCart = true;
+      }
+    });
+
+    if (!productAlreadyInCart) {
+      cartProducts.push(product);
+    }
+
+    updateCart(cartProducts);
+    openFloatCart();
+  };
+
+  removeProduct = (product) => {
+    const index = cartProducts.findIndex((p) => p.id === product.id);
+    if (index >= 0) {
+      cartProducts.splice(index, 1);
+      updateCart(cartProducts);
+    }
+  };
+
+  const proceedToCheckout = () => {
+    const { totalPrice, productQuantity, currencyFormat, currencyId } =
+      cartTotal;
+
+    if (!productQuantity) {
+      alert("Add some product in the cart!");
+    } else {
+      alert(
+        `Checkout - Subtotal: ${currencyFormat} ${formatPrice(
+          totalPrice,
+          currencyId
+        )}`
+      );
+    }
+  };
+
+  changeProductQuantity = (changedProduct) => {
+    try {
+      const product = cartProducts.find((p) => p.id === changedProduct.id);
+      product.quantity = changedProduct.quantity;
+      if (product.quantity <= 0) {
+        this.removeProduct(product);
+      }
+      updateCart(cartProducts);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  useEffect(() => {
+    changeProductQuantity(productToChange);
+
+    addProduct(newProduct);
+
+    removeProduct(productToRemove);
+  }, [productToChange,newProduct,productToRemove]);
+  const products = cartProducts.map((p) => {
+    return (
+      <CartProduct
+        product={p}
+        removeProduct={removeProduct}
+        changeProductQuantity={changeProductQuantity}
+        key={p.id}
+      />
+    );
+  });
+
+  let classes = ["float-cart"];
+
+  if (!!isOpen) {
+    classes.push("float-cart--open");
+  }
+
+
+  return (
+    <div className={classes.join(" ")}>
+      {/* If cart open, show close (x) button */}
+      {isOpen && (
+        <div onClick={closeFloatCart} className="float-cart__close-btn">
+          X
+        </div>
+      )}
+
+      {/* If cart is closed, show bag with quantity of product and open cart action */}
+      {!isOpen && (
+        <span onClick={openFloatCart} className="bag bag--float-cart-closed">
+          <span className="bag__quantity">{cartTotal.productQuantity}</span>
+        </span>
+      )}
+
+      <div className="float-cart__content">
+        <div className="float-cart__header">
+          <span className="bag">
+            <span className="bag__quantity">{cartTotal.productQuantity}</span>
+          </span>
+          <span className="header-title">Cart</span>
+        </div>
+
+        <div className="float-cart__shelf-container">
+          {products}
+          {!products.length && (
+            <p className="shelf-empty">
+              Add some products in the cart <br />
+              :)
+            </p>
+          )}
+        </div>
+
+        <div className="float-cart__footer">
+          <div className="sub">SUBTOTAL</div>
+          <div className="sub-price">
+            <p className="sub-price__val">
+              {`${cartTotal.currencyFormat} ${formatPrice(
+                cartTotal.totalPrice,
+                cartTotal.currencyId
+              )}`}
+            </p>
+            <small className="sub-price__installment">
+              {!!cartTotal.installments && (
+                <span>
+                  {`OR UP TO ${cartTotal.installments} x ${
+                    cartTotal.currencyFormat
+                  } ${formatPrice(
+                    cartTotal.totalPrice / cartTotal.installments,
+                    cartTotal.currencyId
+                  )}`}
+                </span>
+              )}
+            </small>
+          </div>
+          <div onClick={proceedToCheckout} className="buy-btn">
+            Checkout
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const mapStateToProps = (state) => ({
+  cartProducts: state.cart.products,
+  newProduct: state.cart.productToAdd,
+  productToRemove: state.cart.productToRemove,
+  productToChange: state.cart.productToChange,
+  cartTotal: state.total.data,
+});
+
+FloatCart.propTypes = {
+  loadCart: PropTypes.func.isRequired,
+  updateCart: PropTypes.func.isRequired,
+  cartProducts: PropTypes.array.isRequired,
+  newProduct: PropTypes.object,
+  removeProduct: PropTypes.func,
+  productToRemove: PropTypes.object,
+  changeProductQuantity: PropTypes.func,
+  productToChange: PropTypes.object,
+};
+
+export default connect(mapStateToProps, {
+  loadCart,
+  updateCart,
+  removeProduct,
+  changeProductQuantity,
+})(FloatCart);
