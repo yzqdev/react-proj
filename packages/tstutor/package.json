@@ -8,8 +8,8 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "naive-ui": "^2.15.2",
-    "prettier": "^2.3.2",
-    "typescript": "^4.3.5"
+    "naive-ui": "^2.31.0",
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.4"
   }
 }
